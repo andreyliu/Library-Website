@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    h1= title
+
+    ul
+        each inst in bookinstance_list
+            li
+                a(href=inst.url) #{inst.book.title} : #{inst.imprint}&nbsp;-&nbsp;
+                case inst.status
+                    when 'Available'
+                        span.text-success #{inst.status}
+                    when 'Maintenance'
+                        span.text-danger #{inst.status}
+                    default
+                        span.text-warning #{inst.status}
+
+                if inst.status !== 'Available'
+                    span  (Due: #{inst.due_back_formatted} )
+
+        else
+            li There are no book copies in this library.
