@@ -2,11 +2,12 @@ extends layout
 
 block content
     h1= title
-
+    - bookinstance_list.sort((a, b) => {let res = a.book.title.localeCompare(b.book.title); if (res !== 0) return res; return a.imprint.localeCompare(b.imprint)})
     ul
         each inst in bookinstance_list
             li
-                a(href=inst.url) #{inst.book.title} : #{inst.imprint}&nbsp;-&nbsp;
+                a(href=inst.url) #{inst.book.title}
+                span  : #{inst.imprint}&nbsp;-&nbsp;
                 case inst.status
                     when 'Available'
                         span.text-success #{inst.status}
