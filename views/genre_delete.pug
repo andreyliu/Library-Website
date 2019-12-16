@@ -3,7 +3,7 @@ extends layout
 block content
     h1 #{title}: #{genre.name}
     if genre_books.length
-        p #[strong Delete the following books before attempting to delete this genre.]
+        p.text-danger #[strong Delete the following books before attempting to delete this genre.]
 
         div(style='margin-left:20px;margin-top:20px;')
 
@@ -14,7 +14,7 @@ block content
                     a(href=book.url) #{book.title}
                 dd #{book.summary}
     else
-        p Do you really want to delete this genre?
+        p.text-danger Do you really want to delete this genre?
 
         form(method='POST' action='')
             div.form-group

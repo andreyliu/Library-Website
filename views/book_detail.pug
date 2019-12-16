@@ -12,19 +12,12 @@ block content
             a(href=genre_val.url) #{genre_val.name}
             if index < book.genre.length - 1
                 |,&nbsp;
-
-    div(style='margin-let:20px;margin-top:20px')
+    p
+        a(href=book.url + '/delete') Delete book
+    div(style='margin-left:20px;margin-top:20px')
         h4 Copies
-
         each inst in book_instances
             hr
-            //if inst.status === 'Available'
-            //    p.text-success #{inst.status}
-            //else if inst.status === 'Maintenance'
-            //    p.text-danger #{inst.status}
-            //else
-            //    p.text-warning #{inst.status}
-            //
             case inst.status
                 when 'Available'
                     p.text-success #{inst.status}
