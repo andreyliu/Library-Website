@@ -1,0 +1,42 @@
+extends layout
+
+block content
+    h1= title
+    - function selection(inst, pred) { return (inst === undefined || !pred(inst)) ? false : 'selected'; }
+    form(method='POST' action='')
+
+        div.form-group
+            label(for='book') Book:
+            select#book.form-control(name='book' required='true')
+                - book_list.sort((a, b) => a.title.localeCompare(b.title, {sensitivity: 'base'}));
+                for book in book_list
+                    option(value=book._id,
+                        selected=selection(selected_book, x => x === book._id)
+                        ) #{book.title}
+
+        div.form-group
+            label(for='imprint') Imprint:
+            input#imprint.form-control(name='imprint'
+                required='true'
+                value=(bookinstance === undefined ? ''
+                : bookinstance.imprint))
+        div.form-group
+            label(for='due_back') Date when book available:
+            input#due_back.form-control(type='date',
+                name='due_back'
+                value=(bookinstance === undefined ? ''
+                    : bookinstance.due_back_yyyy_mm_dd))
+        div.form-group
+            label(for='status') Status:
+            select#status.form-control(name='status' required='true')
+                option(value='Maintenance', selected=selection(bookinstance, x => x.status === 'Maintenance')) Maintenance
+                option(value='Available', selected=selection(bookinstance, x => x.status === 'Available')) Available
+                option(value='Loaned', selected=selection(bookinstance, x => x.status === 'Loaned')) Loaned
+                option(value='Reserved', selected =selection(bookinstance, x => x.status === 'Reserved')) Reserved
+
+        button.btn.btn-primary(type='submit') Submit
+
+        if errors
+            ul
+                for error in  errors
+                    li!= error.msg
