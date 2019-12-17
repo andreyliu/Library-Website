@@ -12,8 +12,11 @@ block content
             a(href=genre_val.url) #{genre_val.name}
             if index < book.genre.length - 1
                 |,&nbsp;
+    hr
     p
-        a(href=book.url + '/delete') Delete book
+        a(href=book.url+'/delete') Delete Book
+    p
+        a(href=book.url+'/update') Update Book
     div(style='margin-left:20px;margin-top:20px')
         h4 Copies
         each inst in book_instances
