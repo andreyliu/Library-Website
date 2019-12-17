@@ -2,6 +2,12 @@ extends layout
 
 block content
     h1= title
+    if errors
+        ul
+            for error in  errors
+                li!= error.msg
+    if !book_list.length
+        p.text-danger Warning: No book in the library to assign a copy to.
     - function selection(inst, pred) { return (!inst || !pred(inst)) ? false : 'selected'; }
     form(method='POST' action='')
 
@@ -35,8 +41,3 @@ block content
                 option(value='Reserved', selected =selection(bookinstance, x => x.status === 'Reserved')) Reserved
 
         button.btn.btn-primary(type='submit') Submit
-
-        if errors
-            ul
-                for error in  errors
-                    li!= error.msg

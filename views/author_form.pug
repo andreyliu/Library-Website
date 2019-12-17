@@ -2,6 +2,10 @@ extends layout
 
 block content
     h1=title
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
     form(method='POST' action='')
         div.form-group
             label(for='first_name') First Name:
@@ -35,7 +39,3 @@ block content
                 value=(author === undefined ? '': author.date_of_death_f)
             )
         button.btn.btn-primary(type='submit') Submit
-        if errors
-            ul
-                for error in errors
-                    li!= error.msg
