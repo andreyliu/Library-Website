@@ -14,9 +14,10 @@ block content
                 |,&nbsp;
     hr
     p
-        a(href=book.url+'/delete') Delete Book
+        a(href=book.url + '/update') Update Book
     p
-        a(href=book.url+'/update') Update Book
+        a(href=book.url+'/delete') Delete Book
+
     div(style='margin-left:20px;margin-top:20px')
         h4 Copies
         each inst in book_instances
