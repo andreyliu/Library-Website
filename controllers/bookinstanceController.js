@@ -37,8 +37,13 @@ exports.bookinstance_detail = function(req, res, next) {
 // Display BookInstance create form on GET.
 exports.bookinstance_create_get = function(req, res, next) {
     Book.find({}, 'title')
-        .exec((err, books) =>
-        res.render('bookinstance_form', {title: 'Create BookInstance', book_list: books}));
+        .exec((err, books) => {
+            if (err) next(err);
+            res.render('bookinstance_form', {
+                title: 'Create BookInstance',
+                book_list: books
+            });
+        })
 };
 
 // Handle BookInstance create on POST.
@@ -115,10 +120,6 @@ exports.bookinstance_update_get = function(req, res, next) {
             const error = new Error('Book copy not found');
             error.status = 404;
             return next(error);
-        } else if (!results.book_list) {
-            const error = new Error('Book copy not found');
-            error.status = 404;
-            return next(error);
         } else {
             let id = results.bookinstance.book._id.toString();
             for (let i = 0; i < results.book_list.length; i++) {
@@ -132,6 +133,7 @@ exports.bookinstance_update_get = function(req, res, next) {
                 bookinstance: results.bookinstance,
                 book_list: results.book_list,
             });
+
         }
     });
 
