@@ -4,6 +4,8 @@ const async = require('async');
 
 const { body, validationResult, sanitizeBody } = require('express-validator');
 
+const authorNameP = new RegExp(/[a-zA-Z\-]*/);
+
 exports.author_list = function(req, res, next) {
     Author.find()
         .sort({family_name: 1, first_name: 1})
@@ -39,16 +41,21 @@ exports.author_create_get = function(req, res) {
 
 exports.author_create_post = [
     body('first_name').trim()
-        // .isLength({ min: 1})
-        // .withMessage('First name must be specified.')
-        .isAlphanumeric()
-        .withMessage('First name has non-alphanumeric characters.'),
+        .custom(function (val) {
+            if (!authorNameP.test(val)) {
+                throw new Error('Illegal First Name');
+            }
+            return true;
+    }),
     body('family_name').trim()
-        .isLength({ min: 1 })
-        .withMessage('Last name must be specified.')
-        .isAlphanumeric()
-        .withMessage('Last name has non-alphanumeric characters.'),
-
+        .isLength({min: 1})
+        .withMessage('Family name should not be empty')
+        .custom(function (val) {
+            if (!authorNameP.test(val)) {
+                throw new Error('Illegal Family Name');
+            }
+            return true;
+        }),
     body('date_of_birth', 'Invalid date of birth')
         .optional({ checkFalsy: true })
         .isISO8601(),
@@ -64,11 +71,13 @@ exports.author_create_post = [
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
+            console.log('some errors');
+            console.log(errors.array());
             res.render('author_form', { title: 'Create Author',
                 author: req.body,
-                error: errors.array()});
+                errors: errors.array()});
         } else {
-            var author = new Author(
+            const author = new Author(
                 {
                     first_name: req.body.first_name,
                     family_name: req.body.family_name,
@@ -77,7 +86,10 @@ exports.author_create_post = [
                 }
             );
             author.save(function (err) {
-                if (err) { return next(err); }
+                if (err) {
+                    console.log('something\'s wrong');
+                    return next(err);
+                }
                 res.redirect(author.url);
             });
         }
@@ -136,11 +148,55 @@ exports.author_delete_post = function(req, res, next) {
 };
 
 // Display Author update form on GET.
-exports.author_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author update GET');
+exports.author_update_get = function(req, res, next) {
+    Author.findById(req.params.id).exec(function(err, author) {
+       if (err) {
+           return next(err);
+       }
+       return res.render('author_form', {
+           title: 'Update author',
+           author: author,
+       });
+    });
 };
 
 // Handle Author update on POST.
-exports.author_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author update POST');
-};
+exports.author_update_post = [
+    body('first_name', 'First name should be no more than 100 characters long')
+        .trim().isLength({max: 100}),
+    body('family_name', 'Family name cannot be blank').trim().isLength({min: 1}),
+    body('date_of_birth', 'Invalid date of birth').optional({checkFalsy: true}).isISO8601(),
+    body('date_of_death', 'Invalid date of death').optional({checkFalsy: true}).isISO8601(),
+
+    sanitizeBody('first_name').escape(),
+    sanitizeBody('family_name').escape(),
+    sanitizeBody('date_of_birth').toDate(),
+    sanitizeBody('date_of_death').toDate(),
+    function (req, res, next) {
+        const err = validationResult(req);
+        const author = new Author({
+            first_name: req.body.first_name,
+            family_name: req.body.family_name,
+            date_of_birth: req.body.date_of_birth,
+            date_of_death: req.body.date_of_death,
+            _id: req.params.id
+        });
+        if (!err.isEmpty()) {
+            res.render('author_form', {
+                title: 'Author update',
+                author: author,
+                errors: err.array()
+            });
+        } else {
+            Author.findByIdAndUpdate(req.params.id, author, {}, function (error, theauthor) {
+                if (error) return next(error);
+                if (theauthor === null) {
+                    const notFound = new Error('Author not found');
+                    notFound.status = 404;
+                    return next(notFound);
+                }
+                res.redirect(theauthor.url);
+            })
+        }
+    }
+];
