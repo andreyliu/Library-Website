@@ -2,7 +2,7 @@ const Genre = require('../models/genre');
 const Book = require('../models/book');
 const async = require('async');
 
-const validator = require('express-validator');
+const {body, sanitizeBody, validationResult} = require('express-validator');
 
 // Display list of all Genre.
 exports.genre_list = function(req, res, next) {
@@ -41,12 +41,12 @@ exports.genre_create_get = function(req, res) {
 
 // Handle Genre create on POST.
 exports.genre_create_post = [
-    validator.body('name', 'Genre name required').trim().isLength({ min: 1 }),
+    body('name', 'Genre name required').trim().isLength({ min: 1 }),
 
-    validator.sanitizeBody('name').escape(),
+    sanitizeBody('name').escape(),
 
     (req, res, next) => {
-        const errors = validator.validationResult(req);
+        const errors = validationResult(req);
 
         let genre = new Genre(
             { name: req.body.name }
@@ -128,11 +128,40 @@ exports.genre_delete_post = function(req, res, next) {
 };
 
 // Display Genre update form on GET.
-exports.genre_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update GET');
+exports.genre_update_get = function(req, res, next) {
+    Genre.findById(req.params.id).exec(
+        function (err, genre) {
+            if (err) return next(err);
+            res.render('genre_form', {
+                title: 'Update Genre',
+                genre: genre,
+            })
+        }
+    )
 };
 
 // Handle Genre update on POST.
-exports.genre_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update POST');
-};
+exports.genre_update_post = [
+    body('name').trim().isLength({min: 1, max: 100})
+      .withMessage('Genre name must be between 1 and 100 in length'),
+    sanitizeBody('name').escape(),
+    function(req, res, next) {
+        const errors = validationResult(req);
+        const genre = new Genre({
+            name: req.body.name,
+            _id: req.params.id,
+        });
+        if (!errors.isEmpty()) {
+            res.render('genre_form', {
+                title: 'Update Genre',
+                genre: genre,
+                errors: errors,
+            });
+        } else {
+            Genre.findByIdAndUpdate(req.params.id, genre, function(err, thegenre) {
+                if (err) return next(err);
+                res.redirect(thegenre.url);
+            });
+        }
+    }
+];
