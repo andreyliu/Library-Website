@@ -2,7 +2,7 @@ extends layout
 
 block content
     h1= title
-    - function selection(inst, pred) { return (inst === undefined || !pred(inst)) ? false : 'selected'; }
+    - function selection(inst, pred) { return (!inst || !pred(inst)) ? false : 'selected'; }
     form(method='POST' action='')
 
         div.form-group
@@ -11,7 +11,7 @@ block content
                 - book_list.sort((a, b) => a.title.localeCompare(b.title, {sensitivity: 'base'}));
                 for book in book_list
                     option(value=book._id,
-                        selected=selection(selected_book, x => x === book._id.toString())
+                        selected=selection(bookinstance, x => x.book && x.book._id.toString() === book._id.toString())
                         ) #{book.title}
 
         div.form-group

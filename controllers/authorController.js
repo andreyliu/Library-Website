@@ -71,8 +71,6 @@ exports.author_create_post = [
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
-            console.log('some errors');
-            console.log(errors.array());
             res.render('author_form', { title: 'Create Author',
                 author: req.body,
                 errors: errors.array()});
@@ -87,7 +85,6 @@ exports.author_create_post = [
             );
             author.save(function (err) {
                 if (err) {
-                    console.log('something\'s wrong');
                     return next(err);
                 }
                 res.redirect(author.url);
