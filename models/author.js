@@ -23,11 +23,11 @@ AuthorSchema.virtual('name').get(function () {
 });
 
 function formDisplayDate (date) {
-    return date ? moment(date).format('YYYY-MM-DD') : '';
+    return date ? moment.utc(date).format('YYYY-MM-DD') : '';
 }
 
 function detailDate (date) {
-    return date ? moment(date).format('MMM Do, YYYY') : '';
+    return date ? moment.utc(date).format('MMM Do, YYYY') : '';
 }
 
 AuthorSchema
