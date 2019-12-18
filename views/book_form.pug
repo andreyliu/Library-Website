@@ -35,12 +35,12 @@ block content
                         option(value=author._id) #{author.name}
         div.form-group
             label(for='summary') Summary:
-            input#summary.form-control(type='textarea',
+            textarea#summary.form-control(
+                rows='6'
                 placeholder='Summary'
                 name='summary'
                 required='true'
-                value=(book === undefined ? '' : book.summary)
-            )
+            ) #{(book === undefined ? '' : book.summary)}
         div.form-group
             label(for='isbn') ISBN:
             input#isbn.form-control(type='text',
