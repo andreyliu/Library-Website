@@ -8,7 +8,7 @@ const logger = createLogger({
         prettyPrint()
     ),
     transports: [new transports.Console(),
-    new transports.File({ filename: 'logs/changes.log'})]
+    new transports.File({ filename: 'logs/changes.json.log'})]
 });
 
 function log (consoleLogger, label, msg) {
