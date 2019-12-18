@@ -9,9 +9,12 @@ const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog');
+
 const compression = require('compression');
+const helmet = require('helmet');
 
 const app = express();
+app.use(helmet());
 
 const mongoose = require('mongoose');
 const mongoDB = process.env.DB_CONN_STR || '';
