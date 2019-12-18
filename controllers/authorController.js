@@ -8,7 +8,7 @@ const logging = require('../utils/logger');
 
 const { body, validationResult, sanitizeBody } = require('express-validator');
 
-const authorNameP = new RegExp(/[a-zA-Z\-]*/);
+const authorNameP = new RegExp(/^[a-zA-Z\-]*$/);
 
 exports.author_list = function(req, res, next) {
     Author.find()
@@ -47,6 +47,8 @@ exports.author_create_get = function(req, res) {
 
 exports.author_create_post = [
     body('first_name').trim()
+        .isLength({max: 100})
+        .withMessage('Maximum length for first name exceeded')
         .custom(function (val) {
             if (!authorNameP.test(val)) {
                 throw new Error('Illegal First Name');
@@ -56,6 +58,8 @@ exports.author_create_post = [
     body('family_name').trim()
         .isLength({min: 1})
         .withMessage('Family name should not be empty')
+        .isLength({max: 100})
+        .withMessage('Maximum length for last name exceeded')
         .custom(function (val) {
             if (!authorNameP.test(val)) {
                 throw new Error('Illegal Family Name');
