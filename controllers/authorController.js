@@ -1,6 +1,10 @@
 const Author = require('../models/author');
 const Book = require('../models/book');
 const async = require('async');
+const logtag = 'local-library:author';
+const authorlog = require('debug')(logtag);
+
+const logging = require('../utils/logger');
 
 const { body, validationResult, sanitizeBody } = require('express-validator');
 
@@ -20,7 +24,9 @@ exports.author_detail = function(req, res, next) {
         author: callback => Author.findById(req.params.id).exec(callback),
         author_books: callback => Book.find({ author: req.params.id }).exec(callback)
     }, (err, results) => {
-        if (err) return next(err);
+        if (err) {
+            return next(err);
+        }
         if (results.author == null) {
             err = new Error('Author not found');
             err.status = 404;
@@ -87,6 +93,7 @@ exports.author_create_post = [
                 if (err) {
                     return next(err);
                 }
+                logHelper(`create: ${logString(author)}`);
                 res.redirect(author.url);
             });
         }
@@ -138,7 +145,8 @@ exports.author_delete_post = function(req, res, next) {
         } else {
             Author.findByIdAndRemove(req.body.authorid, function (error) {
                 if (error) return next(error);
-                res.redirect('/catalog/authors')
+                logHelper(`delete: ${logString(results.author)}`);
+                res.redirect('/catalog/authors');
             })
         }
     })
@@ -150,6 +158,7 @@ exports.author_update_get = function(req, res, next) {
        if (err) {
            return next(err);
        }
+       logHelper('update attempt: ' + logString(author));
        return res.render('author_form', {
            title: 'Update author',
            author: author,
@@ -185,15 +194,24 @@ exports.author_update_post = [
                 errors: err.array()
             });
         } else {
-            Author.findByIdAndUpdate(req.params.id, author, {}, function (error, theauthor) {
+            Author.findByIdAndUpdate(req.params.id, author, {useFindAndModify: false}, function (error, theauthor) {
                 if (error) return next(error);
-                if (theauthor === null) {
-                    const notFound = new Error('Author not found');
-                    notFound.status = 404;
-                    return next(notFound);
-                }
+                logHelper('update complete: ' + logString(author));
                 res.redirect(theauthor.url);
-            })
+            });
         }
     }
 ];
+
+function logString(author) {
+    return JSON.stringify(author, function(key, val) {
+        if (key.startsWith('date')) {
+            return !val ? val : val.substring(0, 10);
+        }
+        return val;
+    })
+}
+
+function logHelper(msg) {
+    logging(authorlog, logtag, msg);
+}

@@ -5,6 +5,9 @@ const BookInstance = require('../models/bookinstance');
 
 const async = require('async');
 const { body, validationResult, sanitizeBody } = require('express-validator');
+const logtag = 'local-library:book';
+const booklog = require('debug')(logtag);
+const logging = require('../utils/logger');
 
 exports.index = function(req, res) {
     async.parallel({
@@ -141,6 +144,7 @@ exports.book_create_post = [
         } else {
             book.save((err) => {
                 if (err) return next(err);
+                logHelper(`create: ${logString(book)}`);
                 res.redirect(book.url);
             });
         }
@@ -201,6 +205,7 @@ exports.book_delete_post = function(req, res, next) {
             Book.findByIdAndRemove(req.body.bookid,
                 function(error) {
                    if (error) return next(error);
+                   logHelper('delete: ' + logString(results.book));
                    res.redirect('/catalog/books');
                 });
         }
@@ -233,6 +238,7 @@ exports.book_update_get = function(req, res, next) {
                 }
             }
         }
+        logHelper(`update attempt: ${logString(results.book)}`);
         res.render('book_form', {
             title: 'Update Book',
             authors: results.authors,
@@ -273,8 +279,9 @@ exports.book_update_post = [
         if (!errors.isEmpty()) {
             formOnError(res, next, book);
         } else {
-            Book.findByIdAndUpdate(req.params.id, book, {}, function(err, thebook) {
+            Book.findByIdAndUpdate(req.params.id, book, {useFindAndModify: false}, function(err, thebook) {
                 if (err) return next(err);
+                logHelper(`update complete: ${logString(book)}`);
                 res.redirect(thebook.url);
             });
         }
@@ -310,8 +317,19 @@ function formOnError(res, next, book) {
                 authors: results.authors,
                 genres: results.genres,
                 book: book,
-                errors: err.array()
+                errors: err.array(),
             });
         }
     );
+}
+
+function logString(book) {
+    return JSON.stringify(book, function (key, value) {
+        if (key === 'summary') return undefined;
+        return value;
+    });
+}
+
+function logHelper(msg) {
+    logging(booklog, logtag, msg);
 }

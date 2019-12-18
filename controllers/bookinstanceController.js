@@ -3,6 +3,9 @@ const Book = require('../models/book');
 const { body, validationResult, sanitizeBody } = require('express-validator');
 const async = require('async');
 
+const logtag = 'local-library:bookinstance';
+const inslog = require('debug')(logtag);
+const logging = require('../utils/logger');
 // Display list of all BookInstances.
 exports.bookinstance_list = function(req, res, next) {
     BookInstance.find()
@@ -80,6 +83,7 @@ exports.bookinstance_create_post = [
         } else {
             bookinst.save((err) => {
                if (err) return next(err);
+               logHelper(`create: ${logString(bookinst)}`);
                res.redirect(bookinst.url);
             });
         }
@@ -103,6 +107,7 @@ exports.bookinstance_delete_get = function(req, res, next) {
 exports.bookinstance_delete_post = function(req, res) {
     BookInstance.findByIdAndRemove(req.body.id, function (err) {
         if (err) return next(err);
+        logHelper(`delete: ${req.body.id}`);
         res.redirect('/catalog/bookinstances');
     })
 };
@@ -128,12 +133,12 @@ exports.bookinstance_update_get = function(req, res, next) {
                     break;
                 }
             }
+            logHelper(`update attempt: ${results.bookinstance}`);
             res.render('bookinstance_form', {
                 title: 'Update Copy',
                 bookinstance: results.bookinstance,
                 book_list: results.book_list,
             });
-
         }
     });
 
@@ -176,10 +181,12 @@ exports.bookinstance_update_post = [
         if (!errors.isEmpty()) {
             onUpdateError(res, next, inst, errors);
         } else {
-            BookInstance.findByIdAndUpdate(req.params.id, inst, function (err, thebook) {
-                if (err) return next(err);
-                res.redirect(thebook.url);
-            })
+            BookInstance.findByIdAndUpdate(req.params.id, inst, {useFindAndModify: false},
+                function (err, thebook) {
+                    if (err) return next(err);
+                    logHelper(`update complete: ${logString(inst)}`)
+                    res.redirect(thebook.url);
+            });
         }
     }
 ];
@@ -194,4 +201,12 @@ function onUpdateError(res, next, inst, errors) {
             errors: errors.array(),
         });
     })
+}
+
+function logString(inst) {
+    return JSON.stringify(inst);
+}
+
+function logHelper(msg) {
+    logging(inslog, logtag, msg);
 }

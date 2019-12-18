@@ -4,6 +4,10 @@ const async = require('async');
 
 const {body, sanitizeBody, validationResult} = require('express-validator');
 
+const logtag = 'local-library:genre';
+const genrelog = require('debug')(logtag);
+const logging = require('../utils/logger');
+
 // Display list of all Genre.
 exports.genre_list = function(req, res, next) {
     Genre.find()
@@ -63,6 +67,7 @@ exports.genre_create_post = [
                    } else {
                        genre.save(function (err) {
                            if (err) { return next(err); }
+                           logHelper(`create: ${logString(genre)}`)
                            res.redirect(genre.url);
                        });
                    }
@@ -89,9 +94,9 @@ exports.genre_delete_get = function(req, res, next) {
                 title: 'Delete Genre',
                 genre: results.genre,
                 genre_books: results.genre_books
-            })
+            });
         }
-    })
+    });
 };
 
 // Handle Genre delete on POST.
@@ -119,6 +124,7 @@ exports.genre_delete_post = function(req, res, next) {
                 Genre.findByIdAndRemove(req.body.genreid,
                     function(error) {
                         if (error) return next(error);
+                        logHelper(`delete: ${logString(results.genre)}`);
                         res.redirect('/catalog/genres');
                     }
                 )
@@ -132,6 +138,7 @@ exports.genre_update_get = function(req, res, next) {
     Genre.findById(req.params.id).exec(
         function (err, genre) {
             if (err) return next(err);
+            logHelper(`update attempt: ${logString(genre)}`);
             res.render('genre_form', {
                 title: 'Update Genre',
                 genre: genre,
@@ -158,10 +165,19 @@ exports.genre_update_post = [
                 errors: errors,
             });
         } else {
-            Genre.findByIdAndUpdate(req.params.id, genre, function(err, thegenre) {
+            Genre.findByIdAndUpdate(req.params.id, genre, {useFindAndModify: false}, function(err, thegenre) {
                 if (err) return next(err);
+                logHelper(`update complete: ${logString(genre)}`);
                 res.redirect(thegenre.url);
             });
         }
     }
 ];
+
+function logString(genre) {
+    return JSON.stringify(genre);
+}
+
+function logHelper(msg) {
+    logging(genrelog, logtag, msg);
+}
