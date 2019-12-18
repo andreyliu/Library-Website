@@ -4,12 +4,13 @@ block center-content
     h1#register-title= title
 
     div#user-form-block
-        div#user-error-box
-            if errors
-                for error in errors
-                    p.text-danger #{error.msg}
-            if dup
-                p.text-danger #{dup === 'username' ? 'Username' : 'Email'} taken, try another one
+        if errors || dup
+            div#user-error-box.alert.alert-danger
+                if errors
+                    for error in errors
+                        p - #{error.msg}
+                if dup
+                    p #{dup === 'username' ? 'Username' : 'Email'} taken, try another one
         br
         form#user-register-form(method='POST' action='')
             hr

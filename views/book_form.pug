@@ -3,8 +3,9 @@ extends layout
 block content
     h1= title
     if errors
-        for error in errors
-            p.text-danger #{error.msg}
+        div#user-error-box.alert.alert-danger
+            for error in errors
+                p - #{error.msg}
     form(method='POST' action='')
         div.form-group
             label(for='title') Title:

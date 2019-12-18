@@ -15,12 +15,12 @@ exports.user_register_post = [
         .isLength({min: 1, max: 100})
         .withMessage('First name must be between 1 and 100 characters long')
         .matches(nameP)
-        .withMessage('Name must only contain letters and -'),
+        .withMessage('First name must only contain letters and hyphen'),
     body('last_name').trim()
         .isLength({min: 1, max: 100})
         .withMessage('Last name must be between 1 and 100 characters long')
         .matches(nameP)
-        .withMessage('Name must only contain letters and -'),
+        .withMessage('Last name must only contain letters and -'),
     body('username').trim()
         .isLength({min: 4, max: 40})
         .withMessage('Username must be between 4 and 40 characters long')
@@ -51,7 +51,7 @@ exports.user_register_post = [
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             email: req.body.email,
-            password: req.body.password,
+            password: '',
         });
         if (!errors.isEmpty()) {
             res.render('user/user_form', {
@@ -75,6 +75,7 @@ exports.user_register_post = [
                     res.render('user/user_form', context);
                 } else {
                     console.log('username ok');
+                    user.password = req.body.password;
                     user.save(function (err) {
                         if (err) return next(err);
                         res.redirect('/users/login')
