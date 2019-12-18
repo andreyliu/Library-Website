@@ -1,0 +1,32 @@
+extends blank_layout
+
+block center-content
+    div(class='container-fluid')
+        div(class='row')
+            div(class='col-sm-2')
+                block sidebar
+                    ul(class='sidebar-nav')
+                        li
+                            a(href='/catalog') Home
+                        li
+                            a(href='/catalog/books') All books
+                        li
+                            a(href='/catalog/authors') All authors
+                        li
+                            a(href='/catalog/genres') All genres
+                        li
+                            a(href='/catalog/bookinstances') All copies
+                        li
+                            hr
+                        li
+                            a(href='/catalog/book/create') New book
+                        li
+                            a(href='/catalog/author/create') New author
+                        li
+                            a(href='/catalog/genre/create') New genre
+                        li
+                            a(href='/catalog/bookinstance/create') New copy
+            div.col-sm-2
+            div.col-sm-6#main-content
+                block content
+            div.col-sm-2

@@ -3,9 +3,8 @@ extends layout
 block content
     h1= title
     if errors
-        ul
-            for error in errors
-                li!= error.msg
+        for error in errors
+            p.text-danger #{error.msg}
     form(method='POST' action='')
         div.form-group
             label(for='title') Title:

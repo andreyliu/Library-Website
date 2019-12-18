@@ -1,0 +1,70 @@
+extends ../blank_layout
+
+block center-content
+    h1#register-title= title
+
+    div#user-form-block
+        div#user-error-box
+            if errors
+                for error in errors
+                    p.text-danger #{error.msg}
+            if dup
+                p.text-danger #{dup === 'username' ? 'Username' : 'Email'} taken, try another one
+        br
+        form#user-register-form(method='POST' action='')
+            hr
+            div.form-group
+                label(for='first_name') First Name:
+                input#first_name.user-register.form-control(
+                    type='text'
+                    placeholder='First name (Christian) last'
+                    name='first_name'
+                    required='true'
+                    value=(user === undefined ? '' : user.first_name)
+                )
+                br
+                label(for='last_name') Last Name:
+                input#last_name.user-register.form-control(
+                    type='text'
+                    placeholder='Family name (surname)'
+                    name='last_name'
+                    required='true'
+                    value=(user === undefined ? '' : user.last_name)
+                )
+            hr
+            div.form-group
+                label(for='username') Username:
+                input#username.user-register.form-control(
+                    type='text'
+                    placeholder='Choose your username'
+                    name='username'
+                    required='true'
+                    value=(user === undefined ? '' : user.username)
+                )
+                br
+                label(for='email') Email:
+                input#email.user-register.form-control(
+                    type='email'
+                    placeholder='Enter your email address'
+                    name='email'
+                    required='true'
+                    value=(user === undefined ? '': user.email)
+                )
+            hr
+            div.form-group
+                label(for='password') Password:
+                input#password.user-register.form-control(
+                    type='password'
+                    placeholder='Enter your password'
+                    name='password'
+                    required='true'
+                )
+                br
+                label(for='password2') Confirm Password:
+                input#password2.user-register.form-control(
+                    type='password'
+                    placeholder='Confirm your password'
+                    name='password2'
+                    required='true'
+                )
+            button.btn.btn-primary#user-submit-button(type='submit') #{title}

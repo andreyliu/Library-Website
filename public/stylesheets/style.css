@@ -1,11 +1,49 @@
 .sidebar-nav {
-  margin-top: 20px;
+  /*margin-top: 20px;*/
   padding: 0;
   list-style: none;
 }
 
+#main-content {
+  margin-top: 0;
+}
+
 #top-banner {
-  margin-top:5px;
-  margin-left:20px;
   font-style:italic;
+}
+
+.user-register {
+  width: 300px;
+}
+
+#user-form-block {
+  display: block;
+  text-align: center;
+}
+
+#user-register-form {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+#user-error-box{
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  width: 300px;
+}
+
+#register-title {
+  text-align: center;
+}
+
+#navbar-account {
+  margin-right: 5px;
+}
+
+#user-submit-button {
+  float: right;
 }

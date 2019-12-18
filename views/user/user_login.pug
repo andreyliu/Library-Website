@@ -1,0 +1,33 @@
+extends ../blank_layout
+
+block center-content
+    h1#register-title= title
+
+    div#user-form-block
+        if errors
+            for error in errors
+                p.text-danger #{error.msg}
+
+        form#user-register-form(method='POST' action='')
+            hr
+            div.form-group
+                label(for='username') Username:
+                input#username.user-register.form-control(
+                    type='text'
+                    placeholder='Enter your username'
+                    name='username'
+                    required='true'
+                    value=(user === undefined ? '' : user.username)
+                )
+            div.form-group
+                label(for='password') Password:
+                input#password.user-register.form-control(
+                    type='password'
+                    placeholder='Enter your password'
+                    name='password'
+                    required='true'
+                )
+            p
+                a(href='/users/register') New user? Register here
+            div
+                button.btn.btn-primary#user-submit-button(type='submit') Sign in
