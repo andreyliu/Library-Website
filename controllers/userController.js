@@ -1,5 +1,9 @@
 const {body, sanitizeBody, validationResult} = require('express-validator');
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+
+const passport = require('passport');
+const querystring = require('querystring');
 
 const usernameP = new RegExp(/^[a-zA-Z0-9_.]+$/);
 const nameP = new RegExp(/^[a-zA-Z\-]+$/);
@@ -64,7 +68,6 @@ exports.user_register_post = [
                 .exec(function (err, user_found) {
                 if (err) return next(err);
                 if (user_found.length) {
-                    console.log('found duplicate user');
                     let context = { title: 'Register', user: user};
                     if (user_found[0].username === req.body.username) {
                         context.dup = 'username';
@@ -74,12 +77,8 @@ exports.user_register_post = [
 
                     res.render('user/user_form', context);
                 } else {
-                    console.log('username ok');
-                    user.password = req.body.password;
-                    user.save(function (err) {
-                        if (err) return next(err);
-                        res.redirect('/users/login')
-                    });
+                    processPwAndSave(req.body.password, user, next, res);
+
                 }
             });
 
@@ -90,10 +89,48 @@ exports.user_register_post = [
 
 exports.user_login_get = function(req, res) {
     res.render('user/user_login', {
-       title: 'Login'
+        title: 'Login',
+        info: req.query.info,
     });
 };
 
 exports.user_login_post = function(req, res, next) {
+    passport.authenticate('local-signup', {},function(err, user, info) {
+        if (!user) {
+            res.render('user/user_login', { title: 'Login', err_message: info.message });
+            return;
+        }
+        req.login(user, function(err) {
+            if(err) return next(err);
+            res.redirect('/');
+        })
+    })(req, res, next);
+};
 
+function processPwAndSave(passwd, user, next, res) {
+
+    function saveUserWithHash(hash) {
+        user.password = hash;
+        user.save(function (err) {
+            if (err) return next(err);
+            res.redirect('/users/login');
+        });
+    }
+
+    bcrypt.genSalt(10, function (err, salt) {
+        if (err) console.log(err);
+        bcrypt.hash(passwd, salt, function (err, hash) {
+            if (err) console.log(err);
+            saveUserWithHash(hash);
+        });
+
+    });
+}
+
+exports.user_logout_get = function(req, res) {
+    req.logout();
+    const query = querystring.stringify({
+       'info': 'You have successfully logged out'
+    });
+    res.redirect('/users/login?' + query);
 };

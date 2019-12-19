@@ -12,6 +12,13 @@ const catalogRouter = require('./routes/catalog');
 
 const compression = require('compression');
 const helmet = require('helmet');
+const passport = require('passport');
+require('./utils/passport')(passport);
+const flash = require('connect-flash');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const passMessages = require('express-messages');
+
 
 const app = express();
 app.use(helmet());
@@ -35,6 +42,28 @@ app.use(compression()); // Compress all routes
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'logs')));
+
+// messages middleware
+app.use(session({
+  secret: 'diamond crust',
+  resave: true,
+  saveUninitialized: true,
+  store: new MongoStore({ mongooseConnection: db }),
+}));
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.messages = passMessages(req, res, next);
+  next();
+});
+
+// passport config
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('*', (req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

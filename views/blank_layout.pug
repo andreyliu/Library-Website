@@ -17,5 +17,8 @@ html
             | &nbsp;&nbsp;Library
         p.navbar-text#top-banner And ye shall know the truth, and the truth shall make you free.
         p.navbar-text.navbar-right#navbar-account
-          a.navbar-link(href='/users/login') Sign in
+          if user
+            a.navbar-link(href='users/logout') Sign out
+          else
+            a.navbar-link(href='/users/login') Sign in
     block center-content

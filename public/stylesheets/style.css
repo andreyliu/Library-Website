@@ -28,6 +28,11 @@
   text-align: left;
 }
 
+#logout-msg {
+  text-align: center;
+}
+
+#user-info-box,
 #user-error-box{
   display: inline-block;
   margin-left: auto;
