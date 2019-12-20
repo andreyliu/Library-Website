@@ -6,8 +6,6 @@ module.exports = function (passport) {
     passport.use('local-signup', new LocalStrategy({
         usernameField: 'username',
         passwordField: 'password',
-        // passReqToCallBack: true,
-
     },
         function(username, password, done) {
             User.findOne({ username: username }, function (err, user) {

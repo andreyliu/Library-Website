@@ -19,8 +19,8 @@ html
           a.navbar-item#top-banner.text-muted And ye shall know the truth, and the truth shall make you free.
         div.navbar-nav
           if user
-            a.nav-item.nav-link(href='#') My books
-            a.nav-item.nav-link(href='users/logout') Logout
+            a.nav-item.nav-link(href='/users/myborrowed') My books
+            a.nav-item.nav-link(href='/users/logout') Logout
           else
             a.nav-item.nav-link(href='/users/login') Login
     div(style="margin-top: 20px;")

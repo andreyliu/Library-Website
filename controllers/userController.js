@@ -1,5 +1,6 @@
 const {body, sanitizeBody, validationResult} = require('express-validator');
 const User = require('../models/user');
+const BookInstance = require('../models/bookinstance');
 const bcrypt = require('bcryptjs');
 
 const passport = require('passport');
@@ -136,5 +137,17 @@ exports.user_logout_get = function(req, res) {
 };
 
 exports.my_borrowed = function(req, res, next) {
-
+    if (!req.user) {
+        res.redirect('/users/login');
+    }
+    BookInstance.find({borrower: req.user._id})
+        .populate('book')
+        .then(function(bookinst_list) {
+            res.render('bookinstance_list', {
+                title: 'My borrowed',
+                bookinstance_list: bookinst_list,
+                user_view: true,
+            });
+        })
+        .catch(err => next(err));
 };

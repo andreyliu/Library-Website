@@ -2,7 +2,10 @@ extends layout
 
 block content
     h1= title
-    - bookinstance_list.sort((a, b) => {let res = a.book.title.localeCompare(b.book.title); if (res !== 0) return res; return a.imprint.localeCompare(b.imprint)})
+    if user_view
+        - bookinstance_list.sort((a, b) => a.due_back > b.due_back)
+    else
+        - bookinstance_list.sort((a, b) => {let res = a.book.title.localeCompare(b.book.title); if (res !== 0) return res; return a.imprint.localeCompare(b.imprint)})
     ul
         each inst in bookinstance_list
             li
