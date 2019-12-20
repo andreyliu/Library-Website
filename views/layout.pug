@@ -1,32 +1,46 @@
-extends blank_layout
-
-block center-content
-    div(class='container-fluid')
-        div(class='row')
-            div(class='col-sm-2')
-                block sidebar
-                    ul#sidebar-list(class='sidebar-nav')
-                        li
-                            a(href='/catalog') Home
-                        li
-                            a(href='/catalog/books') All books
-                        li
-                            a(href='/catalog/authors') All authors
-                        li
-                            a(href='/catalog/genres') All genres
-                        li
-                            a(href='/catalog/bookinstances') All copies
-                        li
-                            hr
-                        li
-                            a(href='/catalog/book/create') New book
-                        li
-                            a(href='/catalog/author/create') New author
-                        li
-                            a(href='/catalog/genre/create') New genre
-                        li
-                            a(href='/catalog/bookinstance/create') New copy
-            div.col-sm-2
-            div.col-sm-6#main-content
-                block content
-            div.col-sm-2
+doctype html
+html
+    head
+        title= title
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        link(rel='stylesheet' href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
+        script(src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous")
+        script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous")
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+            a.navbar-brand(href='/catalog') Library
+            button.navbar-toggler(type='button' data-toggle='collapse' data-target="#navbarNav")
+                span.navbar-toggler-icon
+            div.collapse.navbar-collapse#navbarNav
+                div.navbar-nav
+                    div.nav-item.dropdown
+                        a.nav-item.nav-link.dropdown-toggle(href='#' data-toggle="dropdown") Catalog
+                        div.dropdown-menu
+                            a.dropdown-item(href='/catalog') Home
+                            a.dropdown-item(href='/catalog/books') All books
+                            a.dropdown-item(href='/catalog/authors') All authors
+                            a.dropdown-item(href='/catalog/genres') All genres
+                            a.dropdown-item(href='/catalog/bookinstances') All copies
+                            if user && (user.role === 'librarian' || user.role === 'admin')
+                                hr
+                                a.dropdown-item(href='/catalog/book/create') New book
+                                a.dropdown-item(href='/catalog/author/create') New author
+                                a.dropdown-item(href='/catalog/genre/create') New genre
+                                a.dropdown-item(href='/catalog/bookinstance/create') New copy
+                div.navbar-nav.mr-auto.ml-auto
+                    a.nav-item#top-banner.text-muted And ye shall know the truth, and the truth shall make you free.
+                div.navbar-nav
+                    if user
+                        a.nav-item.nav-link(href='/users/myborrowed') My books
+                        a.nav-item.nav-link(href='/users/logout') Logout
+                    else
+                        a.nav-item.nav-link(href='/users/login') Login
+        div(style="margin-top: 20px;" class='container-fluid')
+            div(class='row')
+                div.col-sm-4
+                div.col-sm-6#main-content
+                    block content
+                div.col-sm-2
