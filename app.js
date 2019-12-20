@@ -55,11 +55,6 @@ app.use(session({
   saveUninitialized: false,
   store: new MongoStore({ mongooseConnection: db }),
 }));
-// app.use(flash());
-// app.use((req, res, next) => {
-//   res.locals.messages = passMessages(req, res, next);
-//   next();
-// });
 
 // passport config
 app.use(passport.initialize({}));
