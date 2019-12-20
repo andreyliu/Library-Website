@@ -13,7 +13,6 @@ const UserSchema = new Schema({
         enum: ['admin', 'librarian', 'user'],
         default: 'user',
     },
-    borrowed: [{type: Schema.Types.ObjectId, ref: 'BookInstance'}],
 });
 
 UserSchema.virtual('name')

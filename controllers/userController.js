@@ -134,3 +134,7 @@ exports.user_logout_get = function(req, res) {
     });
     res.redirect('/users/login?' + query);
 };
+
+exports.my_borrowed = function(req, res, next) {
+
+};

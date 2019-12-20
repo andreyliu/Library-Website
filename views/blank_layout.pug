@@ -4,21 +4,24 @@ html
     title= title
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
-    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js')
-    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+    link(rel='stylesheet' href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
+    script(src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous")
+    script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous")
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    nav.navbar.navbar-inverse
-      div.container-fluid
-        div.navbar-header
-          a.navbar-brand(href='/catalog')
-            span.glyphicon.glyphicon-book(aria-hidden='true')
-            | &nbsp;&nbsp;Library
-        p.navbar-text#top-banner And ye shall know the truth, and the truth shall make you free.
-        p.navbar-text.navbar-right#navbar-account
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+      a.navbar-brand(href='/catalog') Library
+      button.navbar-toggler(type='button' data-toggle='collapse' data-target="#navbarNav")
+        span.navbar-toggler-icon
+      div.collapse.navbar-collapse#navbarNav
+        div.navbar-nav.mr-auto.ml-auto
+          a.navbar-item#top-banner.text-muted And ye shall know the truth, and the truth shall make you free.
+        div.navbar-nav
           if user
-            a.navbar-link(href='users/logout') Sign out
+            a.nav-item.nav-link(href='#') My books
+            a.nav-item.nav-link(href='users/logout') Logout
           else
-            a.navbar-link(href='/users/login') Sign in
-    block center-content
+            a.nav-item.nav-link(href='/users/login') Login
+    div(style="margin-top: 20px;")
+      block center-content

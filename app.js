@@ -42,6 +42,7 @@ app.use(compression()); // Compress all routes
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'logs')));
+// app.use(express.static(path.join(__dirname, 'node_modules')));
 
 // messages middleware
 app.use(session({

@@ -1,5 +1,6 @@
 const BookInstance = require('../models/bookinstance');
 const Book = require('../models/book');
+const User = require('../models/user');
 const { body, validationResult, sanitizeBody } = require('express-validator');
 const async = require('async');
 
@@ -23,6 +24,7 @@ exports.bookinstance_list = function(req, res, next) {
 exports.bookinstance_detail = function(req, res, next) {
     BookInstance.findById(req.params.id)
         .populate('book')
+        .populate('borrower')
         .exec((err, bookinstance) => {
             if (err) return next(err);
             if (bookinstance == null) {
@@ -119,6 +121,7 @@ exports.bookinstance_update_get = function(req, res, next) {
             .populate('book')
             .exec(cb),
         book_list: cb => Book.find({}, 'title').exec(cb),
+        user_list: cb => User.find(cb),
     }, (err, results) => {
         if (err) return next(err);
         if (!results.bookinstance) {
@@ -138,6 +141,7 @@ exports.bookinstance_update_get = function(req, res, next) {
                 title: 'Update Copy',
                 bookinstance: results.bookinstance,
                 book_list: results.book_list,
+                user_list: results.user_list,
             });
         }
     });
@@ -151,7 +155,7 @@ exports.bookinstance_update_post = [
         .trim().isLength({min: 1, max: 100}),
     body('due_back', 'Invalid due back date')
         .optional({checkFalsy: true}).isISO8601(),
-    body('status').trim().custom(function(data) {
+    body('status').custom(function(data) {
         switch (data) {
             case 'Maintenance':
             case 'Loaned':
@@ -167,6 +171,17 @@ exports.bookinstance_update_post = [
     sanitizeBody('imprint').escape(),
     sanitizeBody('due_back').toDate(),
     sanitizeBody('status').escape(),
+    sanitizeBody('borrower').escape(),
+
+    body('status').custom(async function(data, {req}) {
+       if (data === 'Loaned') {
+           let user = await User.findById(req.body.borrower);
+           if (!user) {
+               throw new Error('Cannot find user');
+           }
+       }
+    }),
+
     function(req, res, next) {
         const errors = validationResult(req);
         let inst = new BookInstance(
@@ -176,6 +191,7 @@ exports.bookinstance_update_post = [
                 due_back: req.body.due_back,
                 status: req.body.status,
                 _id: req.params.id,
+                borrower: req.body.borrower,
             }
         );
         if (!errors.isEmpty()) {
@@ -192,15 +208,21 @@ exports.bookinstance_update_post = [
 ];
 
 function onUpdateError(res, next, inst, errors) {
-    Book.find({}, 'title').exec(function(err, book_list) {
+    async.parallel({
+        book_list: cb => Book.find({}, 'title').exec(cb),
+        user_list: cb => User.find(cb),
+    },
+    function(err, results) {
         if (err) return next(err);
         res.render('bookinstance_form', {
-            title: 'Update Book',
+            title: 'Update Copy',
             bookinstance: inst,
-            book_list: book_list,
+            book_list: results.book_list,
+            user_list: results.user_list,
             errors: errors.array(),
         });
-    })
+
+    });
 }
 
 function logString(inst) {

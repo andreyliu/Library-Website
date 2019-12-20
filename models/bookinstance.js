@@ -13,7 +13,8 @@ const BookInstanceSchema = new Schema(
             enum: ['Available', 'Maintenance', 'Loaned', 'Reserved'],
             default: 'Maintenance'
         },
-        due_back: {type: Date, default: Date.now()}
+        due_back: {type: Date, default: Date.now()},
+        borrower: {type: Schema.Types.ObjectId, ref: 'User'},
     }
 );
 

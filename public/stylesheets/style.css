@@ -1,4 +1,4 @@
-.sidebar-nav {
+#sidebar-list {
   /*margin-top: 20px;*/
   padding: 0;
   list-style: none;
@@ -43,10 +43,6 @@
 
 #register-title {
   text-align: center;
-}
-
-#navbar-account {
-  margin-right: 5px;
 }
 
 #user-submit-button {
