@@ -4,7 +4,7 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-// const logger = require('morgan');
+const favicon = require('serve-favicon');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -14,18 +14,15 @@ const compression = require('compression');
 const helmet = require('helmet');
 const passport = require('passport');
 require('./utils/passport')(passport);
-// TODO
-// const flash = require('connect-flash');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-// // TODO
-// const passMessages = require('express-messages');
 
 const paginate = require('express-paginate');
 
 
 const app = express();
 app.use(helmet());
+// app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 const mongoose = require('mongoose');
 const mongoDB = process.env.MONGODB_URI || '';
@@ -37,7 +34,6 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -46,7 +42,8 @@ app.use(compression()); // Compress all routes
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'logs')));
-// app.use(express.static(path.join(__dirname, 'node_modules')));
+
+// app.use('/public', express.static(path.join(__dirname, 'public', 'images')));
 
 // messages middleware
 app.use(session({

@@ -229,7 +229,7 @@ function logString(author) {
             return !val ? val : val.substring(0, 10);
         }
         return val;
-    })
+    });
 }
 
 function logHelper(msg) {
