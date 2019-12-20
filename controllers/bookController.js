@@ -2,6 +2,7 @@ const Book = require('../models/book');
 const Author = require('../models/author');
 const Genre = require('../models/genre');
 const BookInstance = require('../models/bookinstance');
+const paginate = require('express-paginate');
 
 const async = require('async');
 const { body, validationResult, sanitizeBody } = require('express-validator');
@@ -33,12 +34,28 @@ exports.index = function(req, res) {
 
 // Display list of all books.
 exports.book_list = function(req, res, next) {
-    Book.find({}, 'title author')
-        .populate('author')
-        .exec(function(err, list_books) {
-           if (err) { return next(err); }
-           res.render('book_list', {title: 'Book List', book_list: list_books});
+    async.parallel({
+        list_books: cb => Book.find({}, 'title author')
+            .sort({title: 1})
+            .limit(req.query.limit)
+            .skip(req.skip)
+            .populate('author')
+            .exec(cb),
+        count: cb => Book.count(cb),
+    },
+    function(err, results) {
+        if (err) { return next(err); }
+        let itemCount = results.count;
+        let pageCount = Math.ceil(itemCount / req.query.limit);
+        res.render('book_list', {
+            title: 'Book List',
+            book_list: results.list_books,
+            pageCount: pageCount,
+            itemCount: itemCount,
+            pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
         });
+    });
+
 };
 
 // Display detail page for a specific book.

@@ -1,0 +1,15 @@
+br
+if paginate.hasPreviousPages || paginate.hasNextPages(pageCount)
+    .navigation.well-sm#pagination
+        ul.pager
+            if paginate.hasPreviousPages
+                button.btn.btn-light
+                    a(href=paginate.href(true)).prev
+                        |  Previous
+            if pages
+                each page in pages
+                    a.btn.btn-default(href=page.url)= page.number
+            if paginate.hasNextPages(pageCount)
+                button.btn.btn-light
+                    a(href=paginate.href()).next
+                        | Next&nbsp;

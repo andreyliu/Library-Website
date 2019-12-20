@@ -1,6 +1,8 @@
 const Author = require('../models/author');
 const Book = require('../models/book');
 const async = require('async');
+const paginate = require('express-paginate');
+
 const logtag = 'local-library:author';
 const authorlog = require('debug')(logtag);
 
@@ -11,11 +13,25 @@ const { body, validationResult, sanitizeBody } = require('express-validator');
 const authorNameP = new RegExp(/^[a-zA-Z\-]*$/);
 
 exports.author_list = function(req, res, next) {
-    Author.find()
-        .sort({family_name: 1, first_name: 1})
-        .exec(function (err, list_authors) {
+    async.parallel({
+        list_authors: cb => Author.find()
+            .limit(req.query.limit)
+            .skip(req.skip)
+            .sort({family_name: 1, first_name: 1})
+            .exec(cb),
+        count: cb => Author.count(cb),
+    },
+        function (err, results) {
             if (err) { return next(err); }
-            res.render('author_list', {title: 'Author List', author_list: list_authors});
+            let itemCount = results.count;
+            let pageCount = Math.ceil(itemCount / req.query.limit)
+            res.render('author_list', {
+                title: 'Author List',
+                author_list: results.list_authors,
+                pageCount: pageCount,
+                itemCount: itemCount,
+                pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+            });
         });
 };
 

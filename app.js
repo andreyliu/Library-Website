@@ -14,10 +14,14 @@ const compression = require('compression');
 const helmet = require('helmet');
 const passport = require('passport');
 require('./utils/passport')(passport);
+// TODO
 const flash = require('connect-flash');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+// TODO
 const passMessages = require('express-messages');
+
+const paginate = require('express-paginate');
 
 
 const app = express();
@@ -65,6 +69,9 @@ app.get('*', (req, res, next) => {
   res.locals.user = req.user || null;
   next();
 });
+
+// paginate
+app.use(paginate.middleware(10, 50));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

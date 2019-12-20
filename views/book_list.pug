@@ -4,10 +4,11 @@ block content
     h1= title
 
     ul
-        - book_list.sort((a, b) => a.title.localeCompare(b.title, {sensitivity: 'base'}));
         each book in book_list
             li
                 a(href=book.url) #{book.title}
                 |&nbsp;(#{book.author.name})
         else
             li There are no books.
+
+    include _paginate

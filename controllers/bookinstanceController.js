@@ -3,21 +3,33 @@ const Book = require('../models/book');
 const User = require('../models/user');
 const { body, validationResult, sanitizeBody } = require('express-validator');
 const async = require('async');
+const paginate = require('express-paginate');
 
 const logtag = 'local-library:bookinstance';
 const inslog = require('debug')(logtag);
 const logging = require('../utils/logger');
 // Display list of all BookInstances.
 exports.bookinstance_list = function(req, res, next) {
-    BookInstance.find()
-        .populate('book')
-        .exec(function (err, list_bookinstances) {
-           if (err) { return next(err); }
-           return res.render('bookinstance_list', {
-               title: 'Book Instance List',
-               bookinstance_list: list_bookinstances
-           });
+    async.parallel({
+        list_bookinstances: cb => BookInstance.find()
+            .populate('book')
+            .limit(req.query.limit)
+            .skip(req.skip)
+            .exec(cb),
+        count: cb => BookInstance.count(cb),
+    },
+    function (err, results) {
+        if (err) { return next(err); }
+        let itemCount = results.count;
+        let pageCount = Math.ceil(itemCount / req.query.limit);
+        return res.render('bookinstance_list', {
+            title: 'Book Instance List',
+            bookinstance_list: results.list_bookinstances,
+            pageCount: pageCount,
+            itemCount: itemCount,
+            pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
         });
+    });
 };
 
 // Display detail page for a specific BookInstance.

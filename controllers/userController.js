@@ -142,6 +142,7 @@ exports.my_borrowed = function(req, res, next) {
     }
     BookInstance.find({borrower: req.user._id})
         .populate('book')
+        .sort({due_back: 1})
         .then(function(bookinst_list) {
             res.render('bookinstance_list', {
                 title: 'My borrowed',

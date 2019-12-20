@@ -1,6 +1,7 @@
 const Genre = require('../models/genre');
 const Book = require('../models/book');
 const async = require('async');
+const paginate = require('express-paginate');
 
 const {body, sanitizeBody, validationResult} = require('express-validator');
 
@@ -10,12 +11,27 @@ const logging = require('../utils/logger');
 
 // Display list of all Genre.
 exports.genre_list = function(req, res, next) {
-    Genre.find()
-        .sort({name: 1})
-        .exec(function(err, list_genres) {
-           if (err) return next(err);
-           return res.render('genre_list', {title: 'Genre List', genre_list: list_genres});
-        });
+    async.parallel({
+        list_genres: cb => Genre.find()
+            .limit(req.query.limit)
+            .skip(req.skip)
+            .sort({name: 1})
+            .exec(cb),
+        count: cb => Genre.count(cb),
+    },
+        function(err, results) {
+            if (err) return next(err);
+            let itemCount = results.count;
+            let pageCount = Math.ceil(itemCount / req.query.limit);
+            return res.render('genre_list', {
+                title: 'Genre List',
+                genre_list: results.list_genres,
+                pageCount: pageCount,
+                itemCount: itemCount,
+                pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+            })
+        }
+    );
 };
 
 // Display detail page for a specific Genre.
