@@ -9,7 +9,8 @@ Supports user registration and permission-based modification of index and view.
 
 #### Instructions
 * set environmental variable for connecting to your MongoDB on the cloud: 
-    > $ export MONGODB_URI=<your_connection_string>.
+    
+    `$ export MONGODB_URI=<your_connection_string>.`
 
     For more details see [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). 
 * run `$ npm install` to install dependencies.
