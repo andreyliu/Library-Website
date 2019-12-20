@@ -2,6 +2,7 @@ extends layout
 
 block content
     h1= title
+    hr
     if user_view
         - bookinstance_list.sort((a, b) => a.due_back > b.due_back)
     else
@@ -10,7 +11,9 @@ block content
         each inst in bookinstance_list
             li
                 a(href=inst.url) #{inst.book.title}
-                span  : #{inst.imprint}&nbsp;-&nbsp;
+
+                span  : #{inst.imprint}
+                br
                 case inst.status
                     when 'Available'
                         span.text-success #{inst.status}
@@ -20,7 +23,12 @@ block content
                         span.text-warning #{inst.status}
 
                 if inst.status !== 'Available'
-                    span  (Due: #{inst.due_back_formatted} )
+                    span  |
+                    if inst.overdue
+                        span.text-danger  #[strong Due: #{inst.due_back_formatted}]
+                    else
+                        span.text-info  Due: #{inst.due_back_formatted}
+            br
 
         else
             li There are no book copies in this library.

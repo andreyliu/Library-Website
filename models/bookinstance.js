@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 
 const Schema = mongoose.Schema;
-const dateFormat = 'MMM Do, YYYY';
+const dateFormat = 'MM/DD/YYYY';
 
 const BookInstanceSchema = new Schema(
     {
@@ -34,6 +34,12 @@ BookInstanceSchema
     .virtual('due_back_form')
     .get(function () {
         return moment.utc(this.due_back).format('YYYY-MM-DD');
+    });
+
+BookInstanceSchema
+    .virtual('overdue')
+    .get(function() {
+       return this.due_back < new Date();
     });
 
 module.exports = mongoose.model('BookInstance', BookInstanceSchema);
