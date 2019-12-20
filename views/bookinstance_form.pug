@@ -36,13 +36,15 @@ block content
                 option(value='Available', selected=selection(bookinstance, x => x.status === 'Available')) Available
                 option(value='Loaned', selected=selection(bookinstance, x => x.status === 'Loaned')) Loaned
                 option(value='Reserved', selected =selection(bookinstance, x => x.status === 'Reserved')) Reserved
-        div.form-group
-            lable(for='borrower') Borrower:
-            select#borrower.form-control(name='borrower')
-                option(value='') ----
-                - user_list.sort((a, b) => a.username.localeCompare(b.username))
-                for user in user_list
-                    option(value=user._id,
-                        selected=selection(bookinstance, x => x.borrower && x.borrower._id.toString() === user._id.toString())
-                    ) #{user.username}
+        if user_list
+            div.form-group
+                lable(for='borrower') Borrower:
+                select#borrower.form-control(name='borrower')
+                    option(value='') ----
+
+                    - user_list.sort((a, b) => a.username.localeCompare(b.username))
+                    for user in user_list
+                        option(value=user._id,
+                            selected=selection(bookinstance, x => x.borrower && x.borrower._id.toString() === user._id.toString())
+                        ) #{user.username}
         button.btn.btn-primary(type='submit') Submit
