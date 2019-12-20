@@ -103,7 +103,9 @@ exports.user_login_post = function(req, res, next) {
         }
         req.login(user, function(err) {
             if(err) return next(err);
-            res.redirect('/');
+            req.session.save(function() {
+                res.redirect('/');
+            });
         })
     })(req, res, next);
 };

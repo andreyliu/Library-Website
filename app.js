@@ -15,11 +15,11 @@ const helmet = require('helmet');
 const passport = require('passport');
 require('./utils/passport')(passport);
 // TODO
-const flash = require('connect-flash');
+// const flash = require('connect-flash');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-// TODO
-const passMessages = require('express-messages');
+// // TODO
+// const passMessages = require('express-messages');
 
 const paginate = require('express-paginate');
 
@@ -52,18 +52,18 @@ app.use(express.static(path.join(__dirname, 'logs')));
 app.use(session({
   secret: 'diamond crust',
   resave: true,
-  saveUninitialized: true,
+  saveUninitialized: false,
   store: new MongoStore({ mongooseConnection: db }),
 }));
-app.use(flash());
-app.use((req, res, next) => {
-  res.locals.messages = passMessages(req, res, next);
-  next();
-});
+// app.use(flash());
+// app.use((req, res, next) => {
+//   res.locals.messages = passMessages(req, res, next);
+//   next();
+// });
 
 // passport config
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize({}));
+app.use(passport.session({}));
 
 app.get('*', (req, res, next) => {
   res.locals.user = req.user || null;
@@ -75,7 +75,8 @@ app.use(paginate.middleware(10, 50));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/catalog', catalogRouter);
+
+app.use('/catalog', catalogRouter.modify, catalogRouter.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
